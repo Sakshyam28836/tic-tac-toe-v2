@@ -163,8 +163,10 @@ const features = [
   },
   {
     title: "Author",
-    description: "This Is Made By Sakshyam Paudel and supported By Rakesh Sir",
-    icon: <Gamepad2 size={32} />,
+    description: "This Is Made By Sakshyam Paudel And Supported By Rakesh Sir
+      
+      class 10 C ",
+    icon: <Users size={32} />,
   },
 ];
 
