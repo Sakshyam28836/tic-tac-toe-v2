@@ -65,7 +65,7 @@ const LandingPage = () => {
           className="max-w-4xl mx-auto text-center"
         >
           <h1 className="text-5xl font-extrabold text-slate-800 mb-4">
-            Tic-Tac-Tactical
+            Tic-Tac-Toe-V2
           </h1>
           <p className="text-xl text-slate-600 mb-8">
             A strategic twist on the classic Tic-Tac-Toe, now with online leaderboards!
