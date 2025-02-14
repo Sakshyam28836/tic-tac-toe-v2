@@ -1,182 +1,165 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from '@/integrations/supabase/client';
 import Game from "./Game";
+import Header from "./Header";
+import Leaderboard from "./Leaderboard";
+import AuthPage from "./AuthPage";
 
 const LandingPage = () => {
-  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend'>('menu');
+  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend' | 'leaderboard'>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+  }, []);
 
   if (gameMode === 'ai') {
-    return <Game difficulty={difficulty} isVsAI={true} onBackToMenu={() => setGameMode('menu')} />;
+    return (
+      <>
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Game difficulty={difficulty} isVsAI={true} onBackToMenu={() => setGameMode('menu')} />
+      </>
+    );
   }
 
   if (gameMode === 'friend') {
-    return <Game isVsAI={false} onBackToMenu={() => setGameMode('menu')} />;
+    return (
+      <>
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Game isVsAI={false} onBackToMenu={() => setGameMode('menu')} />
+      </>
+    );
+  }
+
+  if (gameMode === 'leaderboard') {
+    return (
+      <>
+        <Header onLeaderboardClick={() => {}} />
+        <Leaderboard onBack={() => setGameMode('menu')} />
+      </>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#e0eafc] to-[#cfdef3] py-12 px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="max-w-4xl mx-auto text-center"
-      >
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="glass rounded-2xl p-8 mb-8 bg-gradient-to-r from-white/40 to-white/20"
-        >
-          <motion.h1 
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600"
-          >
-            Tic-Tac-Tactical
-          </motion.h1>
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-slate-600 text-lg mb-6"
-          >
-            Challenge your mind with the classic game reimagined
-          </motion.p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              className="glass p-6 rounded-xl bg-gradient-to-br from-white/40 to-white/10 border border-white/20"
-            >
-              <motion.div 
-                className="text-primary mb-4"
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
-                <feature.icon size={32} className="mx-auto" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-slate-600">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
+    <div className="min-h-screen bg-gradient-to-b from-[#e0eafc] to-[#cfdef3]">
+      <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+      <div className="py-24 px-4">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="flex flex-col md:flex-row gap-4 justify-center"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-4xl mx-auto text-center"
         >
-          <div className="flex flex-col gap-4">
+          <h1 className="text-5xl font-extrabold text-slate-800 mb-4">
+            Tic-Tac-Tactical
+          </h1>
+          <p className="text-xl text-slate-600 mb-8">
+            A strategic twist on the classic Tic-Tac-Toe, now with online leaderboards!
+          </p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="flex flex-col md:flex-row gap-4 justify-center"
+          >
+            <div className="flex flex-col gap-4">
+              <Button 
+                size="lg"
+                variant="secondary"
+                className="bg-gradient-to-r from-primary/90 to-blue-500/90 text-white hover:from-primary hover:to-blue-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                onClick={() => setGameMode('ai')}
+              >
+                Play vs AI
+              </Button>
+              <div className="flex gap-2 justify-center">
+                {(['easy', 'medium', 'hard'] as const).map((diff) => (
+                  <Button
+                    key={diff}
+                    variant={difficulty === diff ? 'secondary' : 'outline'}
+                    size="sm"
+                    onClick={() => setDifficulty(diff)}
+                    className={`capitalize ${
+                      difficulty === diff 
+                        ? 'bg-primary/20 text-primary'
+                        : 'hover:bg-primary/10'
+                    }`}
+                  >
+                    {diff}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <Button 
               size="lg"
-              variant="secondary"
-              className="bg-gradient-to-r from-primary/90 to-blue-500/90 text-white hover:from-primary hover:to-blue-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
-              onClick={() => setGameMode('ai')}
+              variant="outline"
+              className="border-2 border-primary/20 hover:border-primary/40 backdrop-blur-sm transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={() => setGameMode('friend')}
             >
-              Play vs AI
+              Play vs Friend
             </Button>
-            <div className="flex gap-2 justify-center">
-              {(['easy', 'medium', 'hard'] as const).map((diff) => (
-                <Button
-                  key={diff}
-                  variant={difficulty === diff ? 'secondary' : 'outline'}
-                  size="sm"
-                  onClick={() => setDifficulty(diff)}
-                  className={`capitalize ${
-                    difficulty === diff 
-                      ? 'bg-primary/20 text-primary'
-                      : 'hover:bg-primary/10'
-                  }`}
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.2 }}
+            className="mt-12"
+          >
+            <h2 className="text-3xl font-bold text-slate-800 mb-4">
+              Features
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  className="glass p-6 rounded-lg bg-white/20 backdrop-blur-sm shadow-md"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 1.4 + index * 0.1 }}
                 >
-                  {diff}
-                </Button>
+                  <div className="text-2xl text-primary mb-2">{feature.icon}</div>
+                  <h3 className="font-semibold text-slate-800 mb-2">{feature.title}</h3>
+                  <p className="text-slate-600">{feature.description}</p>
+                </motion.div>
               ))}
             </div>
-          </div>
-          <Button 
-            size="lg"
-            variant="outline"
-            className="border-2 border-primary/20 hover:border-primary/40 backdrop-blur-sm transition-all duration-300 transform hover:scale-105 shadow-lg"
-            onClick={() => setGameMode('friend')}
-          >
-            Play vs Friend
-          </Button>
+          </motion.div>
         </motion.div>
-
-        <motion.footer 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="mt-16 text-slate-500 text-sm"
-        >
-          <div className="glass p-6 rounded-lg inline-block bg-gradient-to-b from-white/30 to-white/10">
-            <motion.p 
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.2 }}
-            >
-              Created by Sakshyam Paudel
-            </motion.p>
-            <motion.p 
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.3 }}
-            >
-              Supported by Rakesh Sir
-            </motion.p>
-            <motion.p 
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.4 }}
-            >
-              Janak Model Secondary School
-            </motion.p>
-            <motion.p 
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              className="mt-2 font-medium"
-            >
-              © 2025 Sakshyam Paudel. All rights reserved.
-            </motion.p>
-          </div>
-        </motion.footer>
-      </motion.div>
+      </div>
     </div>
   );
 };
 
 const features = [
   {
-    title: "Play Against AI",
-    description: "Challenge our AI with three difficulty levels - from beginner-friendly to expert mode.",
-    icon: Gamepad2,
+    title: "Play vs AI",
+    description: "Challenge our advanced AI with adjustable difficulty levels.",
+    icon: <Gamepad2 size={32} />,
   },
   {
-    title: "Play with Friends",
-    description: "Challenge your friends in local multiplayer mode for classic head-to-head battles.",
-    icon: Users,
+    title: "Multiplayer Mode",
+    description: "Play against your friends in a classic hot-seat mode.",
+    icon: <Users size={32} />,
   },
   {
     title: "Leaderboard",
-    description: "Compete for the top spot by mastering our hardest AI difficulty.",
-    icon: Trophy,
+    description: "Compete with other players and climb to the top of the leaderboard.",
+    icon: <Trophy size={32} />,
   },
 ];
 

@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { checkWinner, getAIMove } from '@/utils/gameLogic';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 type Player = 'X' | 'O' | null;
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -20,6 +20,28 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
   const [winner, setWinner] = useState<Player | 'draw' | null>(null);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
 
+  const recordGameResult = async (result: 'win' | 'loss' | 'draw') => {
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('scores')
+        .insert([
+          {
+            user_id: user.id,
+            difficulty,
+            result,
+          }
+        ]);
+      
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Error recording score:', error);
+      toast.error('Failed to record score');
+    }
+  };
+
   const handleClick = (index: number) => {
     if (board[index] || winner || (!isXNext && isVsAI)) return;
 
@@ -35,8 +57,12 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
       setWinner(currentWinner);
       if (currentWinner === 'draw') {
         toast("It's a draw!");
+        recordGameResult('draw');
       } else {
         toast(`${currentWinner} wins!`);
+        if (isVsAI) {
+          recordGameResult(currentWinner === 'X' ? 'win' : 'loss');
+        }
       }
     } else if (isVsAI && !isXNext && !winner) {
       // AI's turn
