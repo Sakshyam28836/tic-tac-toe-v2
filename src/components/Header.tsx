@@ -39,7 +39,7 @@ const Header = ({ onLeaderboardClick }: HeaderProps) => {
       className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/20"
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">Tic-Tac-Tactical</h1>
+        <h1 className="text-xl font-bold text-slate-800">Tic-Tac-TOE-V²</h1>
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
