@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { GameController, Users, Trophy } from "lucide-react";
+import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const LandingPage = () => {
@@ -75,7 +75,7 @@ const features = [
   {
     title: "Play Against AI",
     description: "Challenge our AI with three difficulty levels - from beginner-friendly to expert mode.",
-    icon: GameController,
+    icon: Gamepad2,
   },
   {
     title: "Play with Friends",
