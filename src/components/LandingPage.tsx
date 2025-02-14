@@ -161,6 +161,11 @@ const features = [
     description: "Compete with other players and climb to the top of the leaderboard.",
     icon: <Trophy size={32} />,
   },
+  {
+    title: "Author",
+    description: "This Is Made By Sakshyam Paudel and supported By Rakesh Sir",
+    icon: <Gamepad2 size={32} />,
+  },
 ];
 
 export default LandingPage;
