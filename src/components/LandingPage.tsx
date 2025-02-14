@@ -1,9 +1,22 @@
 
+import { useState } from 'react';
 import { motion } from "framer-motion";
 import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Game from "./Game";
 
 const LandingPage = () => {
+  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend'>('menu');
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+
+  if (gameMode === 'ai') {
+    return <Game difficulty={difficulty} isVsAI={true} onBackToMenu={() => setGameMode('menu')} />;
+  }
+
+  if (gameMode === 'friend') {
+    return <Game isVsAI={false} onBackToMenu={() => setGameMode('menu')} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#e0eafc] to-[#cfdef3] py-12 px-4">
       <motion.div 
@@ -69,17 +82,38 @@ const LandingPage = () => {
           transition={{ duration: 0.5, delay: 0.8 }}
           className="flex flex-col md:flex-row gap-4 justify-center"
         >
-          <Button 
-            size="lg"
-            variant="secondary"
-            className="bg-gradient-to-r from-primary/90 to-blue-500/90 text-white hover:from-primary hover:to-blue-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Play vs AI
-          </Button>
+          <div className="flex flex-col gap-4">
+            <Button 
+              size="lg"
+              variant="secondary"
+              className="bg-gradient-to-r from-primary/90 to-blue-500/90 text-white hover:from-primary hover:to-blue-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={() => setGameMode('ai')}
+            >
+              Play vs AI
+            </Button>
+            <div className="flex gap-2 justify-center">
+              {(['easy', 'medium', 'hard'] as const).map((diff) => (
+                <Button
+                  key={diff}
+                  variant={difficulty === diff ? 'secondary' : 'outline'}
+                  size="sm"
+                  onClick={() => setDifficulty(diff)}
+                  className={`capitalize ${
+                    difficulty === diff 
+                      ? 'bg-primary/20 text-primary'
+                      : 'hover:bg-primary/10'
+                  }`}
+                >
+                  {diff}
+                </Button>
+              ))}
+            </div>
+          </div>
           <Button 
             size="lg"
             variant="outline"
             className="border-2 border-primary/20 hover:border-primary/40 backdrop-blur-sm transition-all duration-300 transform hover:scale-105 shadow-lg"
+            onClick={() => setGameMode('friend')}
           >
             Play vs Friend
           </Button>
