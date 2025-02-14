@@ -163,9 +163,7 @@ const features = [
   },
   {
     title: "Author",
-    description: "This Is Made By Sakshyam Paudel And Supported By Rakesh Sir
-      
-      class 10 C ",
+    description: "This Is Made By Sakshyam Paudel And Supported By Rakesh Sir",
     icon: <Users size={32} />,
   },
 ];
