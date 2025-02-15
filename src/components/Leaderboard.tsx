@@ -27,7 +27,9 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
         .select(`
           user_id,
           result,
-          profiles:profiles(username)
+          profiles (
+            username
+          )
         `)
         .order('created_at', { ascending: false });
 
