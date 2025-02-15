@@ -1,26 +1,35 @@
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { LogOut, Trophy, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useUser } from '@/hooks/useUser';
+import { LogOut, Trophy } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface HeaderProps {
   onLeaderboardClick: () => void;
-  onProfileClick?: () => void;
 }
 
-const Header = ({ onLeaderboardClick, onProfileClick }: HeaderProps) => {
-  const [mounted, setMounted] = useState(false);
-  const [user] = useUser();
+const Header = ({ onLeaderboardClick }: HeaderProps) => {
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    setMounted(true);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+      toast.success('Successfully logged out!');
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -30,7 +39,7 @@ const Header = ({ onLeaderboardClick, onProfileClick }: HeaderProps) => {
       className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/20"
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">Tic-Tac-Tactical</h1>
+        <h1 className="text-xl font-bold text-slate-800">Tic-Tac-TOE-V²</h1>
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -40,16 +49,6 @@ const Header = ({ onLeaderboardClick, onProfileClick }: HeaderProps) => {
             <Trophy className="w-5 h-5 mr-2" />
             Leaderboard
           </Button>
-          {user && onProfileClick && (
-            <Button
-              variant="ghost"
-              className="text-slate-700 hover:text-primary hover:bg-white/20"
-              onClick={onProfileClick}
-            >
-              <User className="w-5 h-5 mr-2" />
-              Profile
-            </Button>
-          )}
           {user ? (
             <Button
               variant="ghost"
