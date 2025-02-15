@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Trophy, Medal, Crown, Star, Award, Smile } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface LeaderboardEntry {
   username: string;
@@ -24,16 +25,13 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
     try {
       const { data: scores, error } = await supabase
         .from('scores')
-        .select(`
-          user_id,
-          result,
-          profiles (
-            username
-          )
-        `)
+        .select('*, profiles!inner(username)')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Failed to fetch leaderboard data');
+        throw error;
+      }
 
       const userStats = new Map<string, LeaderboardEntry>();
       
