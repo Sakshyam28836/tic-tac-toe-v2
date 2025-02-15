@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useUser } from '@supabase/auth-helpers-react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Trophy, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface HeaderProps {
   onLeaderboardClick: () => void;
