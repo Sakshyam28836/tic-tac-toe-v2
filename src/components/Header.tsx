@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@supabase/auth-helpers-react';
 import { Button } from '@/components/ui/button';
 import { LogOut, Trophy, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/hooks/useUser';
 
 interface HeaderProps {
   onLeaderboardClick: () => void;
@@ -12,8 +13,7 @@ interface HeaderProps {
 
 const Header = ({ onLeaderboardClick, onProfileClick }: HeaderProps) => {
   const [mounted, setMounted] = useState(false);
-  const user = useUser();
-  const supabase = useSupabaseClient();
+  const [user] = useUser();
 
   useEffect(() => {
     setMounted(true);
