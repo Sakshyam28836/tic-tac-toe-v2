@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -18,7 +19,14 @@ const AuthPage = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) throw error;
+        toast.success('Password reset email sent! Check your inbox.');
+        setIsForgotPassword(false);
+      } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -53,10 +61,10 @@ const AuthPage = () => {
     >
       <div className="glass p-8 rounded-2xl bg-white/30 backdrop-blur-lg shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-slate-800 mb-6 text-center">
-          {isLogin ? 'Welcome Back!' : 'Create Account'}
+          {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back!' : 'Create Account'}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {!isForgotPassword && !isLogin && (
             <Input
               placeholder="Username"
               value={username}
@@ -74,32 +82,60 @@ const AuthPage = () => {
             required
             className="bg-white/50"
           />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="bg-white/50"
-          />
+          {!isForgotPassword && (
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="bg-white/50"
+            />
+          )}
           <Button
             type="submit"
             className="w-full bg-gradient-to-r from-primary/90 to-blue-500/90 text-white"
             disabled={loading}
           >
-            {loading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up'}
+            {loading
+              ? 'Loading...'
+              : isForgotPassword
+              ? 'Send Reset Link'
+              : isLogin
+              ? 'Login'
+              : 'Sign Up'}
           </Button>
         </form>
-        <p className="mt-4 text-center text-slate-600">
-          {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-primary hover:underline"
-          >
-            {isLogin ? 'Sign Up' : 'Login'}
-          </button>
-        </p>
+        <div className="mt-4 space-y-2 text-center text-slate-600">
+          {isLogin && !isForgotPassword && (
+            <button
+              onClick={() => setIsForgotPassword(true)}
+              className="text-primary hover:underline text-sm"
+            >
+              Forgot Password?
+            </button>
+          )}
+          {!isForgotPassword && (
+            <p>
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-primary hover:underline"
+              >
+                {isLogin ? 'Sign Up' : 'Login'}
+              </button>
+            </p>
+          )}
+          {isForgotPassword && (
+            <button
+              onClick={() => setIsForgotPassword(false)}
+              className="text-primary hover:underline"
+            >
+              Back to Login
+            </button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
