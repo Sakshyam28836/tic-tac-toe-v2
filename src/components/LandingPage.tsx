@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Gamepad2, Users, Trophy } from "lucide-react";
@@ -27,7 +28,10 @@ const LandingPage = () => {
   if (gameMode === 'ai') {
     return (
       <>
-        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Header 
+          onLeaderboardClick={() => setGameMode('leaderboard')} 
+          onShopClick={() => setGameMode('shop')}
+        />
         <Game difficulty={difficulty} isVsAI={true} onBackToMenu={() => setGameMode('menu')} />
       </>
     );
@@ -36,7 +40,10 @@ const LandingPage = () => {
   if (gameMode === 'friend') {
     return (
       <>
-        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Header 
+          onLeaderboardClick={() => setGameMode('leaderboard')} 
+          onShopClick={() => setGameMode('shop')}
+        />
         <Game isVsAI={false} onBackToMenu={() => setGameMode('menu')} />
       </>
     );
@@ -45,7 +52,10 @@ const LandingPage = () => {
   if (gameMode === 'leaderboard') {
     return (
       <>
-        <Header onLeaderboardClick={() => {}} />
+        <Header 
+          onLeaderboardClick={() => {}} 
+          onShopClick={() => setGameMode('shop')}
+        />
         <Leaderboard onBack={() => setGameMode('menu')} />
       </>
     );
@@ -54,7 +64,10 @@ const LandingPage = () => {
   if (gameMode === 'shop') {
     return (
       <>
-        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Header 
+          onLeaderboardClick={() => setGameMode('leaderboard')} 
+          onShopClick={() => {}}
+        />
         <Shop onBack={() => setGameMode('menu')} />
       </>
     );
