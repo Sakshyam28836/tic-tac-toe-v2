@@ -43,17 +43,18 @@ const getRandomMove = (board: GameBoard): number => {
   return availableMoves[Math.floor(Math.random() * availableMoves.length)];
 };
 
-// New perfect strategy implementation
+// Updated getPerfectMove function for more aggressive AI
 const getPerfectMove = (board: GameBoard, aiPlayer: Player): number => {
   const opponent = aiPlayer === 'X' ? 'O' : 'X';
   
-  // First move optimization: Always take center if available, then corner
+  // First move optimization: Always take center if available
   if (board.filter(cell => cell !== null).length === 0) {
     return 4; // Take center on first move
   }
   
+  // If center is taken by opponent on first move, take corner
   if (board.filter(cell => cell !== null).length === 1 && board[4] === opponent) {
-    // If opponent took center, take corner
+    // Choose corner strategically based on future winning possibilities
     return 0;
   }
 
@@ -61,17 +62,25 @@ const getPerfectMove = (board: GameBoard, aiPlayer: Player): number => {
   const winMove = findWinningMove(board, aiPlayer);
   if (winMove !== -1) return winMove;
 
+  // Create double threat (two possible ways to win)
+  const doubleThreatMove = findDoubleThreatMove(board, aiPlayer);
+  if (doubleThreatMove !== -1) return doubleThreatMove;
+
   // Block opponent's winning move
   const blockMove = findWinningMove(board, opponent);
   if (blockMove !== -1) return blockMove;
 
-  // Create fork opportunity
+  // Create fork opportunity (multiple winning paths)
   const forkMove = findForkMove(board, aiPlayer);
   if (forkMove !== -1) return forkMove;
 
   // Block opponent's fork opportunity
   const blockForkMove = findForkMove(board, opponent);
   if (blockForkMove !== -1) return blockForkMove;
+
+  // Strategic position taking
+  const strategicMove = findStrategicMove(board, aiPlayer);
+  if (strategicMove !== -1) return strategicMove;
 
   // Take center if available
   if (board[4] === null) return 4;
@@ -90,6 +99,64 @@ const getPerfectMove = (board: GameBoard, aiPlayer: Player): number => {
 
   // Fallback to first available move
   return board.findIndex(cell => cell === null);
+};
+
+// New function to find moves that create double winning threats
+const findDoubleThreatMove = (board: GameBoard, player: Player): number => {
+  const emptyCells = board
+    .map((cell, index) => cell === null ? index : -1)
+    .filter(index => index !== -1);
+
+  for (const index of emptyCells) {
+    const boardCopy = [...board];
+    boardCopy[index] = player;
+    
+    let winningPaths = 0;
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+      [0, 4, 8], [2, 4, 6] // diagonals
+    ];
+
+    // Count potential winning paths after this move
+    for (const [a, b, c] of lines) {
+      const cells = [boardCopy[a], boardCopy[b], boardCopy[c]];
+      if (cells.filter(cell => cell === player).length === 2 &&
+          cells.filter(cell => cell === null).length === 1) {
+        winningPaths++;
+      }
+    }
+
+    // If this move creates two or more winning paths, return it
+    if (winningPaths >= 2) return index;
+  }
+
+  return -1;
+};
+
+// New function to find strategic moves that lead to winning positions
+const findStrategicMove = (board: GameBoard, player: Player): number => {
+  const strategicPatterns = [
+    // Corner + Center pattern
+    { cells: [0, 4], next: 8 },
+    { cells: [2, 4], next: 6 },
+    { cells: [6, 4], next: 2 },
+    { cells: [8, 4], next: 0 },
+    // Side + Center pattern
+    { cells: [1, 4], next: 7 },
+    { cells: [3, 4], next: 5 },
+    { cells: [5, 4], next: 3 },
+    { cells: [7, 4], next: 1 }
+  ];
+
+  for (const pattern of strategicPatterns) {
+    if (pattern.cells.every(i => board[i] === player) && 
+        board[pattern.next] === null) {
+      return pattern.next;
+    }
+  }
+
+  return -1;
 };
 
 const findForkMove = (board: GameBoard, player: Player): number => {
