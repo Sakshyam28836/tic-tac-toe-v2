@@ -35,7 +35,7 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
     try {
       const { data: scores, error } = await supabase
         .from('scores')
-        .select('*, profiles!inner(username)')
+        .select('*, profiles!inner(username), user_coins!inner(rank)')
         .eq('difficulty', difficulty)
         .order('created_at', { ascending: false });
 
@@ -44,7 +44,7 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
         throw error;
       }
 
-      const userStats = new Map<string, LeaderboardEntry>();
+      const userStats = new Map<string, LeaderboardEntry & { rank: string }>();
       
       scores?.forEach((score: any) => {
         const username = score.profiles.username;
@@ -52,7 +52,8 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
           username,
           wins: 0,
           losses: 0,
-          draws: 0
+          draws: 0,
+          rank: score.user_coins.rank
         };
 
         if (score.result === 'win') current.wins++;
@@ -64,11 +65,16 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
 
       const leaderboardData = Array.from(userStats.values())
         .sort((a, b) => {
-          // Sort by win rate first
+          // Sort by rank first
+          const rankOrder = { grandmaster: 3, master: 2, heroic: 1, none: 0 };
+          if (rankOrder[a.rank as keyof typeof rankOrder] !== rankOrder[b.rank as keyof typeof rankOrder]) {
+            return rankOrder[b.rank as keyof typeof rankOrder] - rankOrder[a.rank as keyof typeof rankOrder];
+          }
+          // Then by win rate
           const aWinRate = a.wins / (a.wins + a.losses) || 0;
           const bWinRate = b.wins / (b.wins + b.losses) || 0;
           if (bWinRate !== aWinRate) return bWinRate - aWinRate;
-          // If win rates are equal, sort by total wins
+          // Finally by total wins
           return b.wins - a.wins;
         });
 
