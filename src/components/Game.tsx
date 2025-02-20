@@ -1,4 +1,4 @@
-<lov-code>
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -38,27 +38,6 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState<Player | 'draw' | null>(null);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
-  const [currentCoins, setCurrentCoins] = useState(0);
-
-  useEffect(() => {
-    // Fetch initial coin balance
-    const fetchInitialCoins = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('user_coins')
-          .select('coins')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (data) {
-          setCurrentCoins(data.coins);
-        }
-      }
-    };
-    
-    fetchInitialCoins();
-  }, []);
 
   const awardCoins = async (result: 'win' | 'loss' | 'draw') => {
     const user = (await supabase.auth.getUser()).data.user;
@@ -82,7 +61,8 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
       return;
     }
 
-    const newCoins = (data?.coins || 0) + coinsToAward;
+    const currentCoins = data?.coins || 0;
+    const newCoins = currentCoins + coinsToAward;
 
     const { error: updateError } = await supabase
       .from('user_coins')
@@ -94,18 +74,7 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
       return;
     }
 
-    setCurrentCoins(newCoins);
-    
-    // Show both earned coins and new total
-    toast.success(
-      <div className="flex flex-col gap-1">
-        <div>+{coinsToAward} coins earned!</div>
-        <div className="text-sm opacity-80">Total balance: {newCoins.toFixed(1)} coins</div>
-      </div>,
-      {
-        duration: 3000,
-      }
-    );
+    toast.success(`Earned ${coinsToAward} coins!`);
   };
 
   const recordGameResult = async (result: 'win' | 'loss' | 'draw') => {
@@ -185,735 +154,58 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
           <h2 className="text-2xl font-bold text-slate-800 mb-2">
             {isVsAI ? `Playing vs AI (${difficulty})` : 'Playing vs Friend'}
           </h2>
-          <div className="flex flex-col gap-2">
-            <p className="text-slate-600">
-              {winner
-                ? winner === 'draw'
-                  ? "It's a draw!"
-                  : `Winner: ${winner}`
-                : `Next player: ${isXNext ? 'X' : 'O'}`}
-            </p>
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            {/* Display user coin balance */}
-            
+          <p className="text-slate-600">
+            {winner
+              ? winner === 'draw'
+                ? "It's a draw!"
+                : `Winner: ${winner}`
+              : `Next player: ${isXNext ? 'X' : 'O'}`}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {board.map((value, index) => (
+            <motion.button
+              key={index}
+              whileHover={!value && !winner ? { scale: 1.05 } : {}}
+              whileTap={!value && !winner ? { scale: 0.95 } : {}}
+              className={`w-20 h-20 text-4xl font-bold rounded-lg ${
+                value ? 'bg-white/50' : 'bg-white/30'
+              } backdrop-blur-sm border border-white/20 shadow-lg flex items-center justify-center transition-colors
+                ${!value && !winner ? 'hover:bg-white/40' : ''}`}
+              onClick={() => handleClick(index)}
+              disabled={!!value || !!winner || (!isXNext && isVsAI)}
+            >
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: value ? 1 : 0 }}
+                className={value === 'X' ? 'text-blue-600' : 'text-rose-600'}
+              >
+                {value}
+              </motion.span>
+            </motion.button>
+          ))}
+        </div>
+
+        <div className="flex gap-4 justify-center">
+          <Button
+            variant="outline"
+            onClick={resetGame}
+            className="border-2 border-primary/20 hover:border-primary/40"
+          >
+            Reset Game
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={onBackToMenu}
+            className="bg-gradient-to-r from-primary/90 to-blue-500/90 text-white"
+          >
+            Back to Menu
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default Game;
