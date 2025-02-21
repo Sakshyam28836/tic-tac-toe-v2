@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -14,14 +15,87 @@ interface GameProps {
   onBackToMenu: () => void;
 }
 
+const COIN_REWARDS = {
+  easy: { win: 3, draw: 2.5, play: 2 },
+  medium: { win: 4.5, draw: 4.5, play: 3.5 },
+  hard: { win: 6, draw: 5, play: 4 }
+};
+
 const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps) => {
   const [board, setBoard] = useState<Player[]>(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState<Player | 'draw' | null>(null);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
+  const [currentCoins, setCurrentCoins] = useState(0);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        const { data } = await supabase
+          .from('user_coins')
+          .select('coins')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (data) {
+          setCurrentCoins(data.coins);
+        }
+      }
+    };
+    
+    fetchUser();
+  }, []);
+
+  const awardCoins = async (result: 'win' | 'loss' | 'draw') => {
+    if (!user) return;
+
+    let coinsToAward = COIN_REWARDS[difficulty].play;
+    if (result === 'win') {
+      coinsToAward = COIN_REWARDS[difficulty].win;
+    } else if (result === 'draw') {
+      coinsToAward = COIN_REWARDS[difficulty].draw;
+    }
+
+    const { data, error } = await supabase
+      .from('user_coins')
+      .select('coins')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user coins:', error);
+      return;
+    }
+
+    const newCoins = (data?.coins || 0) + coinsToAward;
+
+    const { error: updateError } = await supabase
+      .from('user_coins')
+      .update({ coins: newCoins })
+      .eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('Error updating coins:', updateError);
+      return;
+    }
+
+    setCurrentCoins(newCoins);
+    
+    toast.success(
+      <div className="flex flex-col gap-1">
+        <div>+{coinsToAward} coins earned!</div>
+        <div className="text-sm opacity-80">Total balance: {newCoins.toFixed(1)} coins</div>
+      </div>,
+      {
+        duration: 3000,
+      }
+    );
+  };
 
   const recordGameResult = async (result: 'win' | 'loss' | 'draw') => {
-    const user = (await supabase.auth.getUser()).data.user;
     if (!user) return;
 
     try {
@@ -36,6 +110,7 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
         ]);
       
       if (error) throw error;
+      await awardCoins(result);
     } catch (error: any) {
       console.error('Error recording score:', error);
       toast.error('Failed to record score');
@@ -65,7 +140,6 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
         }
       }
     } else if (isVsAI && !isXNext && !winner) {
-      // AI's turn
       setTimeout(() => {
         const aiMove = getAIMove(board, difficulty, 'O');
         const newBoard = [...board];
@@ -94,13 +168,20 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
           <h2 className="text-2xl font-bold text-slate-800 mb-2">
             {isVsAI ? `Playing vs AI (${difficulty})` : 'Playing vs Friend'}
           </h2>
-          <p className="text-slate-600">
-            {winner
-              ? winner === 'draw'
-                ? "It's a draw!"
-                : `Winner: ${winner}`
-              : `Next player: ${isXNext ? 'X' : 'O'}`}
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-slate-600">
+              {winner
+                ? winner === 'draw'
+                  ? "It's a draw!"
+                  : `Winner: ${winner}`
+                : `Next player: ${isXNext ? 'X' : 'O'}`}
+            </p>
+            {user && (
+              <p className="text-sm text-primary font-medium">
+                Your balance: {currentCoins.toFixed(1)} coins
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">
