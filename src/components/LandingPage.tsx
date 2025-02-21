@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { Gamepad2, Users, Trophy } from "lucide-react";
@@ -8,10 +7,9 @@ import Game from "./Game";
 import Header from "./Header";
 import Leaderboard from "./Leaderboard";
 import AuthPage from "./AuthPage";
-import Shop from './Shop';
 
 const LandingPage = () => {
-  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend' | 'leaderboard' | 'shop'>('menu');
+  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend' | 'leaderboard'>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [user, setUser] = useState<any>(null);
 
@@ -28,10 +26,7 @@ const LandingPage = () => {
   if (gameMode === 'ai') {
     return (
       <>
-        <Header 
-          onLeaderboardClick={() => setGameMode('leaderboard')} 
-          onShopClick={() => setGameMode('shop')}
-        />
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
         <Game difficulty={difficulty} isVsAI={true} onBackToMenu={() => setGameMode('menu')} />
       </>
     );
@@ -40,10 +35,7 @@ const LandingPage = () => {
   if (gameMode === 'friend') {
     return (
       <>
-        <Header 
-          onLeaderboardClick={() => setGameMode('leaderboard')} 
-          onShopClick={() => setGameMode('shop')}
-        />
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
         <Game isVsAI={false} onBackToMenu={() => setGameMode('menu')} />
       </>
     );
@@ -52,23 +44,8 @@ const LandingPage = () => {
   if (gameMode === 'leaderboard') {
     return (
       <>
-        <Header 
-          onLeaderboardClick={() => {}} 
-          onShopClick={() => setGameMode('shop')}
-        />
+        <Header onLeaderboardClick={() => {}} />
         <Leaderboard onBack={() => setGameMode('menu')} />
-      </>
-    );
-  }
-
-  if (gameMode === 'shop') {
-    return (
-      <>
-        <Header 
-          onLeaderboardClick={() => setGameMode('leaderboard')} 
-          onShopClick={() => {}}
-        />
-        <Shop onBack={() => setGameMode('menu')} />
       </>
     );
   }
@@ -134,14 +111,6 @@ const LandingPage = () => {
               onClick={() => setGameMode('friend')}
             >
               Play vs Friend
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="border-2 border-primary/20 hover:border-primary/40 backdrop-blur-sm"
-              onClick={() => setGameMode('shop')}
-            >
-              Shop
             </Button>
           </motion.div>
 

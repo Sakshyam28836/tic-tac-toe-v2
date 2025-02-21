@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -15,67 +14,11 @@ interface GameProps {
   onBackToMenu: () => void;
 }
 
-const COIN_REWARDS = {
-  easy: {
-    win: 3,
-    draw: 2.5,
-    play: 2
-  },
-  medium: {
-    win: 4.5,
-    draw: 4.5,
-    play: 3.5
-  },
-  hard: {
-    win: 6,
-    draw: 5,
-    play: 4
-  }
-};
-
 const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps) => {
   const [board, setBoard] = useState<Player[]>(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState<Player | 'draw' | null>(null);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
-
-  const awardCoins = async (result: 'win' | 'loss' | 'draw') => {
-    const user = (await supabase.auth.getUser()).data.user;
-    if (!user) return;
-
-    let coinsToAward = COIN_REWARDS[difficulty].play;
-    if (result === 'win') {
-      coinsToAward = COIN_REWARDS[difficulty].win;
-    } else if (result === 'draw') {
-      coinsToAward = COIN_REWARDS[difficulty].draw;
-    }
-
-    const { data, error } = await supabase
-      .from('user_coins')
-      .select('coins')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user coins:', error);
-      return;
-    }
-
-    const currentCoins = data?.coins || 0;
-    const newCoins = currentCoins + coinsToAward;
-
-    const { error: updateError } = await supabase
-      .from('user_coins')
-      .update({ coins: newCoins })
-      .eq('user_id', user.id);
-
-    if (updateError) {
-      console.error('Error updating coins:', updateError);
-      return;
-    }
-
-    toast.success(`Earned ${coinsToAward} coins!`);
-  };
 
   const recordGameResult = async (result: 'win' | 'loss' | 'draw') => {
     const user = (await supabase.auth.getUser()).data.user;
@@ -93,9 +36,6 @@ const Game = ({ difficulty = 'medium', isVsAI = true, onBackToMenu }: GameProps)
         ]);
       
       if (error) throw error;
-      
-      // Award coins after recording the game result
-      await awardCoins(result);
     } catch (error: any) {
       console.error('Error recording score:', error);
       toast.error('Failed to record score');

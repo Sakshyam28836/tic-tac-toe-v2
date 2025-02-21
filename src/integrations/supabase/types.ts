@@ -59,24 +59,6 @@ export type Database = {
           },
         ]
       }
-      user_coins: {
-        Row: {
-          coins: number
-          rank: string
-          user_id: string
-        }
-        Insert: {
-          coins?: number
-          rank?: string
-          user_id: string
-        }
-        Update: {
-          coins?: number
-          rank?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
