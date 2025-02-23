@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import { Gamepad2, Users, Trophy, ChartPieIcon, UserIcon } from "lucide-react";
+import { Gamepad2, Users, Trophy, ChartPieIcon, UserIcon, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import Game from "./Game";
@@ -10,8 +10,9 @@ import Leaderboard from "./Leaderboard";
 import AuthPage from "./AuthPage";
 import Profile from "./Profile";
 import Stats from "./Stats";
+import Shop from "./Shop";
 
-type GameMode = 'menu' | 'ai' | 'friend' | 'leaderboard' | 'profile' | 'stats';
+type GameMode = 'menu' | 'ai' | 'friend' | 'leaderboard' | 'profile' | 'stats' | 'shop';
 
 const LandingPage = () => {
   const [gameMode, setGameMode] = useState<GameMode>('menu');
@@ -69,6 +70,15 @@ const LandingPage = () => {
       <>
         <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
         <Stats />
+      </>
+    );
+  }
+
+  if (gameMode === 'shop') {
+    return (
+      <>
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Shop onBack={() => setGameMode('menu')} />
       </>
     );
   }
@@ -158,6 +168,14 @@ const LandingPage = () => {
             >
               <ChartPieIcon className="w-5 h-5" />
               Statistics
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2"
+              onClick={() => setGameMode('shop')}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              Shop
             </Button>
           </motion.div>
 
