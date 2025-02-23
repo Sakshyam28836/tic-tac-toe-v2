@@ -33,11 +33,11 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
 
   const fetchLeaderboard = async () => {
     try {
-      // First get all scores for the selected difficulty
-      const { data: scores, error: scoresError } = await supabase
+      setLoading(true);
+      
+      const { data: scores, error } = await supabase
         .from('scores')
         .select(`
-          user_id,
           result,
           profiles (
             username
@@ -45,15 +45,18 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
         `)
         .eq('difficulty', difficulty);
 
-      if (scoresError) {
+      if (error) {
         toast.error('Failed to fetch leaderboard data');
-        throw scoresError;
+        console.error('Error fetching scores:', error);
+        return;
       }
 
       // Process the scores into user statistics
       const userStats = new Map<string, LeaderboardEntry>();
       
-      scores?.forEach((score: any) => {
+      scores?.forEach((score) => {
+        if (!score.profiles?.username) return;
+        
         const username = score.profiles.username;
         const current = userStats.get(username) || {
           username,
@@ -64,24 +67,30 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
 
         if (score.result === 'win') current.wins++;
         else if (score.result === 'loss') current.losses++;
-        else current.draws++;
+        else if (score.result === 'draw') current.draws++;
 
         userStats.set(username, current);
       });
 
       const leaderboardData = Array.from(userStats.values())
         .sort((a, b) => {
+          const aTotal = a.wins + a.losses;
+          const bTotal = b.wins + b.losses;
+          const aWinRate = aTotal > 0 ? a.wins / aTotal : 0;
+          const bWinRate = bTotal > 0 ? b.wins / bTotal : 0;
+          
           // Sort by win rate first
-          const aWinRate = a.wins / (a.wins + a.losses) || 0;
-          const bWinRate = b.wins / (b.wins + b.losses) || 0;
           if (bWinRate !== aWinRate) return bWinRate - aWinRate;
           // If win rates are equal, sort by total wins
-          return b.wins - a.wins;
+          if (b.wins !== a.wins) return b.wins - a.wins;
+          // If wins are equal, sort by total games (more games played is better)
+          return (bTotal + b.draws) - (aTotal + a.draws);
         });
 
       setLeaderboard(leaderboardData);
-    } catch (error: any) {
-      console.error('Error fetching leaderboard:', error);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An error occurred while fetching the leaderboard');
     } finally {
       setLoading(false);
     }
@@ -183,7 +192,7 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
           ) : (
             <div className="space-y-4">
               {leaderboard.map((entry, index) => {
-                const totalGames = entry.wins + entry.losses + entry.draws;
+                const totalGames = entry.wins + entry.losses;
                 const winRate = calculateWinRate(entry.wins, totalGames);
                 
                 return (
