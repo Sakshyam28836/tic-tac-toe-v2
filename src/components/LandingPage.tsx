@@ -1,15 +1,20 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import { Gamepad2, Users, Trophy } from "lucide-react";
+import { Gamepad2, Users, Trophy, ChartPieIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import Game from "./Game";
 import Header from "./Header";
 import Leaderboard from "./Leaderboard";
 import AuthPage from "./AuthPage";
+import Profile from "./Profile";
+import Stats from "./Stats";
+
+type GameMode = 'menu' | 'ai' | 'friend' | 'leaderboard' | 'profile' | 'stats';
 
 const LandingPage = () => {
-  const [gameMode, setGameMode] = useState<'menu' | 'ai' | 'friend' | 'leaderboard'>('menu');
+  const [gameMode, setGameMode] = useState<GameMode>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [user, setUser] = useState<any>(null);
 
@@ -50,6 +55,24 @@ const LandingPage = () => {
     );
   }
 
+  if (gameMode === 'profile') {
+    return (
+      <>
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Profile />
+      </>
+    );
+  }
+
+  if (gameMode === 'stats') {
+    return (
+      <>
+        <Header onLeaderboardClick={() => setGameMode('leaderboard')} />
+        <Stats />
+      </>
+    );
+  }
+
   if (!user) {
     return <AuthPage />;
   }
@@ -75,7 +98,7 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="flex flex-col md:flex-row gap-4 justify-center"
+            className="flex flex-col md:flex-row gap-4 justify-center mb-8"
           >
             <div className="flex flex-col gap-4">
               <Button 
@@ -111,6 +134,30 @@ const LandingPage = () => {
               onClick={() => setGameMode('friend')}
             >
               Play vs Friend
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+            className="flex gap-4 justify-center mb-12"
+          >
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2"
+              onClick={() => setGameMode('profile')}
+            >
+              <UserIcon className="w-5 h-5" />
+              Profile
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2"
+              onClick={() => setGameMode('stats')}
+            >
+              <ChartPieIcon className="w-5 h-5" />
+              Statistics
             </Button>
           </motion.div>
 
