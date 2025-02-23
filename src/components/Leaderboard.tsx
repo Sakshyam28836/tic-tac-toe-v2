@@ -33,17 +33,24 @@ const Leaderboard = ({ onBack }: { onBack: () => void }) => {
 
   const fetchLeaderboard = async () => {
     try {
-      const { data: scores, error } = await supabase
+      // First get all scores for the selected difficulty
+      const { data: scores, error: scoresError } = await supabase
         .from('scores')
-        .select('*, profiles!inner(username)')
-        .eq('difficulty', difficulty)
-        .order('created_at', { ascending: false });
+        .select(`
+          user_id,
+          result,
+          profiles (
+            username
+          )
+        `)
+        .eq('difficulty', difficulty);
 
-      if (error) {
+      if (scoresError) {
         toast.error('Failed to fetch leaderboard data');
-        throw error;
+        throw scoresError;
       }
 
+      // Process the scores into user statistics
       const userStats = new Map<string, LeaderboardEntry>();
       
       scores?.forEach((score: any) => {
