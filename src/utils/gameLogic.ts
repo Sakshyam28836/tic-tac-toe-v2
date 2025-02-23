@@ -29,7 +29,6 @@ export const getAIMove = (board: GameBoard, difficulty: Difficulty, aiPlayer: Pl
     case 'medium':
       return Math.random() < 0.6 ? getBestMove(board, aiPlayer) : getRandomMove(board);
     case 'hard':
-      // In hard mode, always use the perfect strategy with no randomness
       return getPerfectMove(board, aiPlayer);
     default:
       return getRandomMove(board);
@@ -43,21 +42,21 @@ const getRandomMove = (board: GameBoard): number => {
   return availableMoves[Math.floor(Math.random() * availableMoves.length)];
 };
 
-// New perfect strategy implementation
+// Improved perfect strategy implementation
 const getPerfectMove = (board: GameBoard, aiPlayer: Player): number => {
   const opponent = aiPlayer === 'X' ? 'O' : 'X';
   
-  // First move optimization: Always take center if available, then corner
-  if (board.filter(cell => cell !== null).length === 0) {
-    return 4; // Take center on first move
+  // Optimization: Take center on first move if available
+  if (board.every(cell => cell === null)) {
+    return 4;
   }
-  
+
+  // Optimization: If center is taken by opponent on first move, take corner
   if (board.filter(cell => cell !== null).length === 1 && board[4] === opponent) {
-    // If opponent took center, take corner
     return 0;
   }
 
-  // Check for immediate win
+  // Immediate win check
   const winMove = findWinningMove(board, aiPlayer);
   if (winMove !== -1) return winMove;
 
@@ -65,86 +64,43 @@ const getPerfectMove = (board: GameBoard, aiPlayer: Player): number => {
   const blockMove = findWinningMove(board, opponent);
   if (blockMove !== -1) return blockMove;
 
-  // Create fork opportunity
-  const forkMove = findForkMove(board, aiPlayer);
-  if (forkMove !== -1) return forkMove;
+  // Initialize alpha-beta values for perfect play
+  let bestScore = -Infinity;
+  let bestMove = -1;
+  const alpha = -Infinity;
+  const beta = Infinity;
 
-  // Block opponent's fork opportunity
-  const blockForkMove = findForkMove(board, opponent);
-  if (blockForkMove !== -1) return blockForkMove;
+  // Try each available move
+  for (let i = 0; i < 9; i++) {
+    if (board[i] === null) {
+      board[i] = aiPlayer;
+      const score = minimax(board, 0, false, aiPlayer, opponent, alpha, beta);
+      board[i] = null;
 
-  // Take center if available
-  if (board[4] === null) return 4;
-
-  // Take opposite corner of opponent's move
-  const oppositeCornerMove = getOppositeCorner(board, opponent);
-  if (oppositeCornerMove !== -1) return oppositeCornerMove;
-
-  // Take any empty corner
-  const cornerMove = getEmptyCorner(board);
-  if (cornerMove !== -1) return cornerMove;
-
-  // Take any empty side
-  const sideMove = getEmptySide(board);
-  if (sideMove !== -1) return sideMove;
-
-  // Fallback to first available move
-  return board.findIndex(cell => cell === null);
-};
-
-const findForkMove = (board: GameBoard, player: Player): number => {
-  const emptyCells = board
-    .map((cell, index) => cell === null ? index : -1)
-    .filter(index => index !== -1);
-
-  for (const index of emptyCells) {
-    const boardCopy = [...board];
-    boardCopy[index] = player;
-    
-    let winningPaths = 0;
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6]
-    ];
-
-    for (const [a, b, c] of lines) {
-      const cells = [boardCopy[a], boardCopy[b], boardCopy[c]];
-      if (cells.filter(cell => cell === player).length === 1 &&
-          cells.filter(cell => cell === null).length === 2) {
-        winningPaths++;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = i;
       }
     }
-
-    if (winningPaths >= 2) return index;
   }
 
-  return -1;
-};
+  // If no winning strategy is found, use positional strategy
+  if (bestMove === -1) {
+    // Prioritize strategic positions
+    const strategicMoves = [
+      4,  // Center
+      0, 2, 6, 8,  // Corners
+      1, 3, 5, 7   // Sides
+    ];
 
-const getOppositeCorner = (board: GameBoard, player: Player): number => {
-  const oppositeCorners = [[0, 8], [2, 6]];
-  for (const [corner1, corner2] of oppositeCorners) {
-    if (board[corner1] === player && board[corner2] === null) return corner2;
-    if (board[corner2] === player && board[corner1] === null) return corner1;
+    for (const move of strategicMoves) {
+      if (board[move] === null) {
+        return move;
+      }
+    }
   }
-  return -1;
-};
 
-const getEmptyCorner = (board: GameBoard): number => {
-  const corners = [0, 2, 6, 8];
-  for (const corner of corners) {
-    if (board[corner] === null) return corner;
-  }
-  return -1;
-};
-
-const getEmptySide = (board: GameBoard): number => {
-  const sides = [1, 3, 5, 7];
-  for (const side of sides) {
-    if (board[side] === null) return side;
-  }
-  return -1;
+  return bestMove;
 };
 
 const findWinningMove = (board: GameBoard, player: Player): number => {
@@ -156,14 +112,59 @@ const findWinningMove = (board: GameBoard, player: Player): number => {
 
   for (const [a, b, c] of lines) {
     const cells = [board[a], board[b], board[c]];
-    const nullIndex = cells.indexOf(null);
-    if (nullIndex !== -1 && 
-        cells.filter(cell => cell === player).length === 2 &&
+    if (cells.filter(cell => cell === player).length === 2 &&
         cells.filter(cell => cell === null).length === 1) {
-      return [a, b, c][nullIndex];
+      const emptyIndex = cells.indexOf(null);
+      return [a, b, c][emptyIndex];
     }
   }
   return -1;
+};
+
+// Enhanced minimax with alpha-beta pruning for perfect play
+const minimax = (
+  board: GameBoard,
+  depth: number,
+  isMaximizing: boolean,
+  aiPlayer: Player,
+  opponent: Player,
+  alpha: number,
+  beta: number
+): number => {
+  const result = checkWinner(board);
+  
+  // Terminal state evaluations
+  if (result === aiPlayer) return 10 - depth;
+  if (result === opponent) return depth - 10;
+  if (result === 'draw') return 0;
+
+  if (isMaximizing) {
+    let maxEval = -Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        board[i] = aiPlayer;
+        const eval = minimax(board, depth + 1, false, aiPlayer, opponent, alpha, beta);
+        board[i] = null;
+        maxEval = Math.max(maxEval, eval);
+        alpha = Math.max(alpha, eval);
+        if (alpha >= beta) break; // Beta cutoff
+      }
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        board[i] = opponent;
+        const eval = minimax(board, depth + 1, true, aiPlayer, opponent, alpha, beta);
+        board[i] = null;
+        minEval = Math.min(minEval, eval);
+        beta = Math.min(beta, eval);
+        if (beta <= alpha) break; // Alpha cutoff
+      }
+    }
+    return minEval;
+  }
 };
 
 // Keep this as a fallback strategy
@@ -175,7 +176,7 @@ const getBestMove = (board: GameBoard, player: Player): number => {
   for (let i = 0; i < board.length; i++) {
     if (board[i] === null) {
       board[i] = player;
-      const score = minimax(board, 0, false, player, opponent);
+      const score = minimax(board, 0, false, player, opponent, -Infinity, Infinity);
       board[i] = null;
 
       if (score > bestScore) {
@@ -186,39 +187,4 @@ const getBestMove = (board: GameBoard, player: Player): number => {
   }
 
   return bestMove;
-};
-
-const minimax = (
-  board: GameBoard,
-  depth: number,
-  isMaximizing: boolean,
-  player: Player,
-  opponent: Player
-): number => {
-  const result = checkWinner(board);
-  if (result === player) return 10 - depth;
-  if (result === opponent) return depth - 10;
-  if (result === 'draw') return 0;
-
-  if (isMaximizing) {
-    let bestScore = -Infinity;
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = player;
-        bestScore = Math.max(bestScore, minimax(board, depth + 1, false, player, opponent));
-        board[i] = null;
-      }
-    }
-    return bestScore;
-  } else {
-    let bestScore = Infinity;
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = opponent;
-        bestScore = Math.min(bestScore, minimax(board, depth + 1, true, player, opponent));
-        board[i] = null;
-      }
-    }
-    return bestScore;
-  }
 };
